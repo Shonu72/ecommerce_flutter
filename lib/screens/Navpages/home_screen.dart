@@ -1,18 +1,18 @@
+import 'package:ecommerce/controllers/add_to_cart_controller.dart';
+import 'package:ecommerce/controllers/products_controller.dart';
 import 'package:ecommerce/core/theme/colors.dart';
 import 'package:ecommerce/core/utils/category_list.dart';
 import 'package:ecommerce/core/utils/image_slider.dart';
-import 'package:ecommerce/core/utils/trending_product.dart';
+import 'package:ecommerce/core/utils/product_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  final productController = Get.put(ProductController());
+  final cartController = Get.put(CartController());
+  HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,16 +117,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 5),
                 SizedBox(
                   height: 280,
-                  child: StaggeredGridView.countBuilder(
-                    crossAxisCount: 2,
-                    itemCount: 2,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    itemBuilder: (context, index) {
-                      return const ProductTile();
-                    },
-                    staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
-                  ),
+                  child: Obx(() {
+                    if (productController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return StaggeredGridView.countBuilder(
+                        crossAxisCount: 2,
+                        itemCount: 2,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5,
+                        itemBuilder: (context, index) {
+                          return ProductTile(
+                              productController.productList[index]);
+                        },
+                        staggeredTileBuilder: (index) =>
+                            const StaggeredTile.fit(1),
+                      );
+                    }
+                  }),
+                  //    StaggeredGridView.countBuilder(
+                  //     crossAxisCount: 2,
+                  //     itemCount: 2,
+                  //     crossAxisSpacing: 5,
+                  //     mainAxisSpacing: 5,
+                  //     itemBuilder: (context, index) {
+                  //       return const ProductTile();
+                  //     },
+                  //     staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
+                  //   ),
                 ),
                 const Row(
                   children: [
@@ -157,16 +175,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 5),
                 SizedBox(
                   height: 280,
-                  child: StaggeredGridView.countBuilder(
-                    crossAxisCount: 2,
-                    itemCount: 2,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    itemBuilder: (context, index) {
-                      return const ProductTile();
-                    },
-                    staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
-                  ),
+                  child: Obx(() {
+                    if (productController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return StaggeredGridView.countBuilder(
+                        crossAxisCount: 2,
+                        // itemCount: productController.productList.length,
+                        itemCount: 2,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5,
+                        itemBuilder: (context, index) {
+                          return ProductTile(
+                              productController.productList[index + 4]);
+                        },
+                        staggeredTileBuilder: (index) =>
+                            const StaggeredTile.fit(1),
+                      );
+                    }
+                  }),
                 ),
               ],
             ),

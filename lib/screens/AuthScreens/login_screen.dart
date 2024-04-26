@@ -2,7 +2,7 @@ import 'package:ecommerce/core/theme/colors.dart';
 import 'package:ecommerce/routes/routes.dart';
 import 'package:ecommerce/screens/widgets/custom_alert.dart';
 import 'package:ecommerce/screens/widgets/custom_textfield.dart';
-import 'package:ecommerce/services/auth_service.dart';
+import 'package:ecommerce/services/api_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    if (await AuthenticationApi.isUserLoggedIn()) {
+    if (await ApiService.isUserLoggedIn()) {
       _navigateToHomeScreen();
     }
   }
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final String username = usernameController.text.trim();
     final String password = passwordController.text.trim();
 
-    final bool loggedIn = await AuthenticationApi.login(username, password);
+    final bool loggedIn = await ApiService.login(username, password);
 
     if (loggedIn) {
       _navigateToHomeScreen();

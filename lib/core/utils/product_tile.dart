@@ -1,13 +1,19 @@
+import 'package:ecommerce/controllers/add_to_cart_controller.dart';
+import 'package:ecommerce/controllers/products_controller.dart';
 import 'package:ecommerce/core/theme/colors.dart';
-import 'package:ecommerce/screens/widgets/app_text_widget.dart';
+import 'package:ecommerce/models/products.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+// import 'package:get/get.dart';
 
 class ProductTile extends StatelessWidget {
-  // final Product product;
-  const ProductTile({super.key});
-
+  final Product product;
+  ProductTile(this.product, {super.key});
+  final cartController = Get.find<CartController>();
+  final productController = Get.find<ProductController>();
   @override
   Widget build(BuildContext context) {
+    int rating = product.rating.rate!.toInt();
     // final cartController = Get.find<CartController>();
     // final productController = Get.find<ProductController>();
     return Card(
@@ -22,8 +28,11 @@ class ProductTile extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
-                    "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80",
+                    // "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80",
+                    product.image,
+                    height: 130,
                     fit: BoxFit.cover,
+
                     width: double.maxFinite,
                   ),
                 ),
@@ -39,26 +48,26 @@ class ProductTile extends StatelessWidget {
               children: List.generate(5, (index) {
                 return Icon(
                   Icons.star,
-                  color: index < 4
+                  color: index < rating
                       ? AppColors.starColor
                       : AppColors.secondaryColor,
                 );
               }),
             ),
-            const Text(
-              // product.name,
-              "Evening Dress",
+            Text(
+              product.title,
+              // "Evening Dress",
               maxLines: 1,
-              style:
-                  TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                  fontFamily: 'Rubik', fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
-            const Text(
-              // product.name,
-              "\$200",
+            Text(
+              "\$ ${product.price}",
+              // "\$200",
               maxLines: 1,
-              style:
-                  TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                  fontFamily: 'Rubik', fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
@@ -76,7 +85,10 @@ class ProductTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      cartController.addToCart(productController.productList[
+                          productController.productList.indexOf(product)]);
+                    },
                     child: const Text(
                       "Add to Cart",
                       style: TextStyle(color: Colors.white),
