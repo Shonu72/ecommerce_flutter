@@ -1,6 +1,8 @@
 import 'package:ecommerce/controllers/add_to_cart_controller.dart';
 import 'package:ecommerce/controllers/category_controller.dart';
+import 'package:ecommerce/controllers/sort_product_controller.dart';
 import 'package:ecommerce/core/theme/colors.dart';
+import 'package:ecommerce/core/utils/category_list.dart';
 import 'package:ecommerce/core/utils/product_tile.dart';
 import 'package:ecommerce/routes/routes.dart';
 import 'package:ecommerce/screens/Navpages/home_screen.dart';
@@ -8,11 +10,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
-class CategoryPageScreen extends StatelessWidget {
+class CategoryPageScreen extends StatefulWidget {
+  const CategoryPageScreen({super.key});
+
+  @override
+  State<CategoryPageScreen> createState() => _CategoryPageScreenState();
+}
+
+class _CategoryPageScreenState extends State<CategoryPageScreen> {
   final productController = Get.put(CategoryController());
   final cartController = Get.put(CartController());
+  final sortCOntroller = Get.put(SortProductController());
 
-  CategoryPageScreen({super.key});
+  int _value = 0;
+
+  List<String> Categorietitle = [
+    "All",
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +43,7 @@ class CategoryPageScreen extends StatelessWidget {
                 size: 30,
               )),
           title: const Text(
-            'All Categories',
+            'Explore',
             style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
@@ -49,6 +67,7 @@ class CategoryPageScreen extends StatelessWidget {
           ],
         ),
         body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
           child: Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,232 +76,144 @@ class CategoryPageScreen extends StatelessWidget {
                   color: AppColors.secondaryColor,
                   thickness: 0.4,
                 ),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 12, top: 5),
-                      child: Text(
-                        'Men\'s Clothing',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Rubik'),
-                      ),
+                Container(
+                  padding: const EdgeInsets.only(left: 15),
+                  width: MediaQuery.of(context).size.width,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(Categorietitle.length, (index) {
+                        return MyRadioListTile<int>(
+                          value: index,
+                          groupValue: _value,
+                          leading: Categorietitle[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _value = value!;
+                              productController.fetchProductsByCategory(
+                                  _value == 0 ? null : Categorietitle[_value]);
+                            });
+                          },
+                        );
+                      }),
                     ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.mens);
-                        },
-                        child: const Text(
-                          'View All',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.secondaryColor,
-                              fontFamily: 'Rubik'),
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                SizedBox(
-                  height: 280,
-                  child: Obx(() {
-                    if (productController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return StaggeredGridView.countBuilder(
-                        crossAxisCount: 2,
-                        itemCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        itemBuilder: (context, index) {
-                          return ProductTile(
-                              productController.mensproductList[index]);
-                        },
-                        staggeredTileBuilder: (index) =>
-                            const StaggeredTile.fit(1),
-                      );
-                    }
-                  }),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 12, top: 5),
-                      child: Text(
-                        'Women\'s Clothing',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Rubik'),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Wrap(
+                        children: [
+                          Icon(Icons.filter_alt_rounded),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text("Filter")
+                        ],
                       ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
+                      InkWell(
                         onTap: () {
-                          Get.toNamed(Routes.womens);
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              final tiles = [
+                                {
+                                  'icon': Icons.fiber_new_outlined,
+                                  'text': 'latest'
+                                },
+                                {'icon': Icons.currency_rupee, 'text': 'price'},
+                                {
+                                  'icon': Icons.star_border_purple500,
+                                  'text': 'popular'
+                                },
+                                {
+                                  'icon': Icons.new_releases_outlined,
+                                  'text': 'relevence'
+                                },
+                              ];
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Text('Sort by',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  SizedBox(
+                                    height: 250,
+                                    child: ListView.builder(
+                                      itemCount: tiles.length,
+                                      itemBuilder: (context, index) {
+                                        final tile = tiles[index];
+                                        return ListTile(
+                                          leading:
+                                              Icon(tile['icon'] as IconData),
+                                          title: Text(tile['text'] as String),
+                                          onTap: () {
+                                            // Perform API call or any action based on the tile
+                                            // For example, you can use tile['text'] to determine the action
+                                            sortCOntroller
+                                                .sortProducts("products");
+                                            print('Selected: ${tile['text']}');
+                                            Navigator.pop(context);
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
-                        child: const Text(
-                          'View All',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.secondaryColor,
-                              fontFamily: 'Rubik'),
+                        child: const Wrap(
+                          children: [
+                            Icon(Icons.format_align_center_sharp),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text("Sort By")
+                          ],
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 5),
                 SizedBox(
-                  height: 280,
-                  child: Obx(() {
-                    if (productController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return StaggeredGridView.countBuilder(
-                        crossAxisCount: 2,
-                        itemCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        itemBuilder: (context, index) {
-                          return ProductTile(
-                              productController.womensproductList[index]);
-                        },
-                        staggeredTileBuilder: (index) =>
-                            const StaggeredTile.fit(1),
-                      );
-                    }
-                  }),
-                  //    StaggeredGridView.countBuilder(
-                  //     crossAxisCount: 2,
-                  //     itemCount: 2,
-                  //     crossAxisSpacing: 5,
-                  //     mainAxisSpacing: 5,
-                  //     itemBuilder: (context, index) {
-                  //       return const ProductTile();
-                  //     },
-                  //     staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
-                  //   ),
-                ),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 12, top: 5),
-                      child: Text(
-                        'Electronics',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Rubik'),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.electric);
-                        },
-                        child: const Text(
-                          'View All',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.secondaryColor,
-                              fontFamily: 'Rubik'),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 5),
-                SizedBox(
-                  height: 280,
-                  child: Obx(() {
-                    if (productController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return StaggeredGridView.countBuilder(
-                        crossAxisCount: 2,
-                        // itemCount: productController.productList.length,
-                        itemCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        itemBuilder: (context, index) {
-                          return ProductTile(
-                              productController.electronicsproductList[index]);
-                        },
-                        staggeredTileBuilder: (index) =>
-                            const StaggeredTile.fit(1),
-                      );
-                    }
-                  }),
-                ),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12, right: 12, top: 5),
-                      child: Text(
-                        'Jewellery',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Rubik'),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.jewelery);
-                        },
-                        child: const Text(
-                          'View All',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.secondaryColor,
-                              fontFamily: 'Rubik'),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 5),
-                SizedBox(
-                  height: 280,
-                  child: Obx(() {
-                    if (productController.isLoading.value) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return StaggeredGridView.countBuilder(
-                        crossAxisCount: 2,
-                        // itemCount: productController.productList.length,
-                        itemCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        itemBuilder: (context, index) {
-                          return ProductTile(
-                              productController.jeweleryproductList[index]);
-                        },
-                        staggeredTileBuilder: (index) =>
-                            const StaggeredTile.fit(1),
-                      );
-                    }
-                  }),
+                  height: MediaQuery.of(context).size.height,
+                  child: Expanded(
+                    child: Obx(() {
+                      if (productController.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return StaggeredGridView.countBuilder(
+                          crossAxisCount: 2,
+                          itemCount: productController.productList.length,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          itemBuilder: (context, index) {
+                            return ProductTile(
+                                productController.productList[index], () {
+                              Get.toNamed(Routes.productDetails,
+                                  arguments:
+                                      productController.productList[index].id);
+                            });
+                          },
+                          staggeredTileBuilder: (index) =>
+                              const StaggeredTile.fit(1),
+                        );
+                      }
+                    }),
+                  ),
                 ),
               ],
             ),

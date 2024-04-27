@@ -1,21 +1,26 @@
 import 'package:ecommerce/controllers/add_to_cart_controller.dart';
 import 'package:ecommerce/controllers/products_controller.dart';
 import 'package:ecommerce/core/theme/colors.dart';
+import 'package:ecommerce/core/utils/product_details.dart';
 import 'package:ecommerce/models/products.dart';
+import 'package:ecommerce/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:get/get.dart';
 
 class ProductTile extends StatelessWidget {
   final Product product;
-  ProductTile(this.product, {super.key});
+  final VoidCallback ontap;
+  ProductTile(
+    this.product,
+    this.ontap, {
+    super.key,
+  });
   final cartController = Get.find<CartController>();
   final productController = Get.find<ProductController>();
   @override
   Widget build(BuildContext context) {
     int rating = product.rating.rate!.toInt();
-    // final cartController = Get.find<CartController>();
-    // final productController = Get.find<ProductController>();
     return Card(
       elevation: 2,
       child: Padding(
@@ -27,13 +32,16 @@ class ProductTile extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    // "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80",
-                    product.image,
-                    height: 130,
-                    fit: BoxFit.cover,
+                  child: InkWell(
+                    onTap: ontap,
+                    child: Image.network(
+                      // "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80",
+                      product.image,
+                      height: 130,
+                      fit: BoxFit.cover,
 
-                    width: double.maxFinite,
+                      width: double.maxFinite,
+                    ),
                   ),
                 ),
                 const Positioned(

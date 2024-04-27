@@ -3,15 +3,24 @@ import 'package:ecommerce/controllers/products_controller.dart';
 import 'package:ecommerce/core/theme/colors.dart';
 import 'package:ecommerce/core/utils/category_list.dart';
 import 'package:ecommerce/core/utils/image_slider.dart';
+import 'package:ecommerce/core/utils/product_details.dart';
 import 'package:ecommerce/core/utils/product_tile.dart';
+import 'package:ecommerce/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final productController = Get.put(ProductController());
+
   final cartController = Get.put(CartController());
-  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +95,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
+                // ContainerList(),
                 ContainerList(),
                 const SizedBox(height: 10),
                 const Row(
@@ -128,7 +138,17 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSpacing: 5,
                         itemBuilder: (context, index) {
                           return ProductTile(
-                              productController.productList[index]);
+                              productController.productList[index], () {
+                            Get.toNamed(Routes.productDetails,
+                                arguments:
+                                    productController.productList[index].id);
+                            //  Navigator.of(context).push(MaterialPageRoute(
+                            //     builder: (context) => ProductDetailsScreen(
+                            //           productId: productController.productList[index].id,
+                            //         )));
+                            print(
+                                "This id id ://////////////// ${productController.productList[index].id}");
+                          });
                         },
                         staggeredTileBuilder: (index) =>
                             const StaggeredTile.fit(1),
@@ -187,7 +207,11 @@ class HomeScreen extends StatelessWidget {
                         mainAxisSpacing: 5,
                         itemBuilder: (context, index) {
                           return ProductTile(
-                              productController.productList[index + 4]);
+                              productController.productList[index + 3], () {
+                            Get.toNamed(Routes.productDetails,
+                                arguments:
+                                    productController.productList[index+3].id);
+                          });
                         },
                         staggeredTileBuilder: (index) =>
                             const StaggeredTile.fit(1),

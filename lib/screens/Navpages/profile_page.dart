@@ -1,6 +1,9 @@
+import 'package:ecommerce/routes/routes.dart';
 import 'package:ecommerce/screens/widgets/app_text_widget.dart';
 import 'package:ecommerce/screens/widgets/profile_setting_widget.dart';
+import 'package:ecommerce/services/api_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -106,7 +109,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icons.question_mark_outlined),
             ProfileSettingWidget(
                 onTap: () {
-                  // logout();
+                  ApiService.logout();
+                  Get.offAllNamed(Routes.loginScreen);
                 },
                 text: "Logout",
                 icon: Icons.logout_outlined),

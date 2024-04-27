@@ -47,9 +47,9 @@ class ApiService {
     }
   }
 
-  static Future<List<Product>> fetchProductsForElectric() async {
-    var response = await client.get(
-        Uri.parse('https://fakestoreapi.com/products/category/electronics'));
+  static Future<List<Product>> fetchProductsByCategory(String category) async {
+    var response = await client
+        .get(Uri.parse('https://fakestoreapi.com/products/category/$category'));
     if (response.statusCode == 200) {
       var jsonString = response.body;
       return productFromJson(jsonString);
@@ -58,31 +58,21 @@ class ApiService {
     }
   }
 
-  static Future<List<Product>> fetchProductsForJewelery() async {
-    var response = await client.get(
-        Uri.parse('https://fakestoreapi.com/products/category/jewelery'));
+  static Future<Product> fetchProductById(int id) async {
+    var response =
+        await client.get(Uri.parse('https://fakestoreapi.com/products/$id'));
     if (response.statusCode == 200) {
-      var jsonString = response.body;
-      return productFromJson(jsonString);
+      print(
+          "data form api ////////////////// ${Product.fromJson(jsonDecode(response.body))}");
+      return Product.fromJson(jsonDecode(response.body));
     } else {
-      return <Product>[];
+      throw Exception('Failed to load product');
     }
   }
 
-  static Future<List<Product>> fetchProductsForMen() async {
-    var response = await client.get(
-        Uri.parse('https://fakestoreapi.com/products/category/men\'s clothing'));
-    if (response.statusCode == 200) {
-      var jsonString = response.body;
-      return productFromJson(jsonString);
-    } else {
-      return <Product>[];
-    }
-  }
-
-  static Future<List<Product>> fetchProductsForWomen() async {
+  static Future<List<Product>> sortProducts(String category) async {
     var response = await client.get(Uri.parse(
-        'https://fakestoreapi.com/products/category/women\'s clothing'));
+        'https://fakestoreapi.com/products/category/$category?sort=aesc'));
     if (response.statusCode == 200) {
       var jsonString = response.body;
       return productFromJson(jsonString);

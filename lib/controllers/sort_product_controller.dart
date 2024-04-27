@@ -2,25 +2,25 @@ import 'package:ecommerce/models/products.dart';
 import 'package:ecommerce/services/api_services.dart';
 import 'package:get/get.dart';
 
-class CategoryController extends GetxController {
+class SortProductController extends GetxController {
   var isLoading = true.obs;
   var productList = List<Product>.empty().obs;
 
   @override
   void onInit() {
-    fetchProductsByCategory(category);
+    sortProducts(category);
     super.onInit();
   }
 
   Category? category;
-  void fetchProductsByCategory(category) async {
+  void sortProducts(category) async {
     try {
       isLoading(true);
       var products;
       if (category == null) {
         products = await ApiService.fetchProducts();
       } else {
-        products = await ApiService.fetchProductsByCategory(category);
+        products = await ApiService.sortProducts(category);
       }
       if (products != null) {
         productList.value = products;
@@ -29,6 +29,4 @@ class CategoryController extends GetxController {
       isLoading(false);
     }
   }
-
-
 }
